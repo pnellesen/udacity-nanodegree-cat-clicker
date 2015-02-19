@@ -32,7 +32,7 @@ function loadData() {
     	 });
     }); 
     // load nytimes
-    // small chenge here
+    
     // YOUR CODE GOES HERE!
     	
     return false;
