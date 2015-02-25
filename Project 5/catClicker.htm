@@ -65,17 +65,11 @@ var catDiv = function(catClass,id,imgW,imgH,imgSrc) {
 		var imgId = this.id + 'img';
 		var resetId = 'reset' + this.id;
 		document.getElementById(imgId).addEventListener("click", function() {
-			incrementCounter.call(self);
+			self.increment();
 		});	
 		document.getElementById(resetId).addEventListener("click", function() {
-			resetCounter.call(self);
+			self.resetCounter();
 		});
-	}
-	function incrementCounter() {
-		this.increment();
-	}
-	function resetCounter() {
-		this.resetCounter();
 	}
 }
 //comment
