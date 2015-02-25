@@ -25,38 +25,13 @@ $(document).ready(function(){
 	for (i=0;i < 2;i++) {
 		var catId = 'cat' + i;
 		if (i == 0) {
-			var thisCat = new catDiv('catClicker',catId,400,400,'http://upload.wikimedia.org/wikipedia/commons/2/22/Turkish_Van_Cat.jpg');
+			allCats.push(new catDiv('catClicker',catId,400,400,'http://upload.wikimedia.org/wikipedia/commons/2/22/Turkish_Van_Cat.jpg'));
 		} else {
-			var thisCat = new catDiv('catClicker',catId);	
+			allCats.push(new catDiv('catClicker',catId));
 		}
-		
-		allCats.push(thisCat);
 		allCats[i].draw();
-		
+		allCats[i].addListeners();
 	}	
-	$('.catImg').click(function(e) {
-		for (i=0;i<allCats.length;i++) {
-			var imgId = allCats[i].id + 'img';
-			if (imgId == this.id) {
-				var oldCount = allCats[i].counter;
-				allCats[i].counter++;
-				console.log("cat clicked: " + this.id + " - Old counter: " + oldCount + " - new count: " + allCats[i].counter);
-				$('#' + allCats[i].id + 'counter').html(allCats[i].counter);
-			}
-		}
-	});	
-	$('.catCountReset').click(function(e) {
-		console.log("Reset clicked. ID is: " + this.id);
-		for (i=0;i<allCats.length;i++) {
-			var imgId = 'reset' + allCats[i].id;
-			if (imgId == this.id) {
-				allCats[i].counter = 0;
-				$('#' + allCats[i].id + 'counter').html(allCats[i].counter);
-			}
-		}
-	});	
-	
-	
 });
 var catDiv = function(catClass,id,imgW,imgH,imgSrc) {
 	this.id = id;
@@ -75,8 +50,35 @@ var catDiv = function(catClass,id,imgW,imgH,imgSrc) {
 		$('#' + id).append(this.resetDiv);
 		console.log('got to here. cat id is ' + id + ' - container is: ' + $('#' + id).html());
 	}
-	
+	this.increment = function () {
+		this.counter++;
+		$('#' + this.id + 'counter').html(this.counter);
+		console.log('Image ' + this.id + ' clicked. counter is: ' + this.counter);
+	}
+	this.resetCounter = function () {
+		this.counter = 0;
+		$('#' + this.id + 'counter').html(this.counter);
+		console.log(this.id + ' Reset clicked. counter is: ' + this.counter);
+	}
+	this.addListeners = function () {// This solution found at http://stackoverflow.com/questions/12024483/how-to-pass-parameter-to-function-using-in-addeventlistener 
+		var self = this;
+		var imgId = this.id + 'img';
+		var resetId = 'reset' + this.id;
+		document.getElementById(imgId).addEventListener("click", function() {
+			incrementCounter.call(self);
+		});	
+		document.getElementById(resetId).addEventListener("click", function() {
+			resetCounter.call(self);
+		});
+	}
+	function incrementCounter() {
+		this.increment();
+	}
+	function resetCounter() {
+		this.resetCounter();
+	}
 }
+
 </script>
 </body>
 </html>
