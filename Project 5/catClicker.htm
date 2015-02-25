@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+.catClicker {
+	display:inline-block;
+	margin:10px;
+}
+.catClickCounter {
+}
+.catCountReset {
+width:100px;height:20px;border:1px solid #cccccc;background:#ffffff;text-align:center;cursor:pointer;
+}
+
+</style>
+<title>Pat's Cat Clicker</title>
+</head>
+<body>
+<h1>Click the images below to increment the counter</h1>
+<script src="js/libs/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+	var allCats = [];
+	for (i=0;i < 2;i++) {
+		var catId = 'cat' + i;
+		if (i == 0) {
+			var thisCat = new catDiv('catClicker',catId,400,400,'http://upload.wikimedia.org/wikipedia/commons/2/22/Turkish_Van_Cat.jpg');
+		} else {
+			var thisCat = new catDiv('catClicker',catId);	
+		}
+		
+		allCats.push(thisCat);
+		allCats[i].draw();
+		
+	}	
+	$('.catImg').click(function(e) {
+		for (i=0;i<allCats.length;i++) {
+			var imgId = allCats[i].id + 'img';
+			if (imgId == this.id) {
+				var oldCount = allCats[i].counter;
+				allCats[i].counter++;
+				console.log("cat clicked: " + this.id + " - Old counter: " + oldCount + " - new count: " + allCats[i].counter);
+				$('#' + allCats[i].id + 'counter').html(allCats[i].counter);
+			}
+		}
+	});	
+	$('.catCountReset').click(function(e) {
+		console.log("Reset clicked. ID is: " + this.id);
+		for (i=0;i<allCats.length;i++) {
+			var imgId = 'reset' + allCats[i].id;
+			if (imgId == this.id) {
+				allCats[i].counter = 0;
+				$('#' + allCats[i].id + 'counter').html(allCats[i].counter);
+			}
+		}
+	});	
+	
+	
+});
+var catDiv = function(catClass,id,imgW,imgH,imgSrc) {
+	this.id = id;
+	this.container = '<div class="' + catClass + '" id="' + id + '"></div>';
+	this.imgWidth = imgW || 300;
+	this.imgHeight = imgH || 300;
+	this.imgSrc = imgSrc || 'https://placekitten.com/g/' + this.imgWidth + '/' + this.imgHeight;
+	this.catImg = '<div id="' + id + 'img" class="catImg" title="Click Me!"><img src="' + this.imgSrc + '" width="' + this.imgWidth + '" height="' + this.imgHeight + '"/></div>';
+	this.counter = 0;
+	this.counterDiv = '<h3>This cat clicked <span id="' + this.id + 'counter">0</span> times</h3>';
+	this.resetDiv = '<div class="catCountReset" id="reset' + this.id + '"  title="Reset counter to 0">Reset</div>';
+	this.draw = function() {
+		$('body').append(this.container);
+		$('#' + id).append(this.counterDiv);
+		$('#' + id).append(this.catImg);
+		$('#' + id).append(this.resetDiv);
+		console.log('got to here. cat id is ' + id + ' - container is: ' + $('#' + id).html());
+	}
+	
+}
+</script>
+</body>
+</html>
