@@ -12,56 +12,82 @@
 .catCountReset {
 width:100px;height:20px;border:1px solid #cccccc;background:#ffffff;text-align:center;cursor:pointer;
 }
+.catContainer {
+border:1px solid #000000;padding:5px;width:500px;height:500px;margin-top:10px;
 
+}
 </style>
 <title>Pat's Cat Clicker</title>
 </head>
 <body>
 <h1>Click the images below to increment the counter</h1>
+<div><select id="catSelect"><option>-- Please choose a cat --</select></div>
+<div id="catContainer" class="catContainer"></div>
 <script src="js/libs/jquery.min.js"></script>
 <script>
+var catUrls = [
+	"http://mentoringmoments.org/wp-content/uploads/2011/11/cat1-400x400.png",
+	"http://img2.timeinc.net/health/img/web/2013/03/slides/cat-allergies-400x400.jpg",
+	"http://img2.timeinc.net/health/img/web/2012/10/blogs/fat-cat-overweight-400x400.jpg",
+	"http://healthnewsandviews.files.wordpress.com/2012/12/kitty-cat-400x400.jpg",
+	"http://fullyfeline.com/wp-content/uploads/2012/10/black-cat-5a-400x400.jpg"
+];
+var allCats = [];
 $(document).ready(function(){
-	var allCats = [];
-	for (i=0;i < 2;i++) {
+	for (i=0;i < catUrls.length; i++) {
 		var catId = 'cat' + i;
-		if (i == 0) {
-			allCats.push(new catDiv('catClicker',catId,400,400,'http://upload.wikimedia.org/wikipedia/commons/2/22/Turkish_Van_Cat.jpg'));
-		} else {
-			allCats.push(new catDiv('catClicker',catId));
-		}
-		allCats[i].draw();
-		allCats[i].addListeners();
-	}	
+		allCats.push(new catDiv('catClicker',catId,400,400,catUrls[i],'catContainer'));
+		$('#catSelect').append('<option value="' + i + '">Cat ' + (i+1) + '</option>');
+	}
+	$('#catSelect').change(function() {
+		var catIdx = $(this).find(":selected").val();
+		allCats[catIdx].draw();
+	});
+	$('.catContainer').on('click','.catImg',function() {
+		var clickIdx = $('#catSelect option:selected').val();// kind of cheating, but it works ;)
+		allCats[clickIdx].increment();
+	});
+	$('.catContainer').on('click','.catCountReset',function() {
+		var clickIdx = $('#catSelect option:selected').val();
+		allCats[clickIdx].resetCounter();
+	});
 });
-var catDiv = function(catClass,id,imgW,imgH,imgSrc) {
+// The following is our "catDiv" object - could probably be done better, but works as a prototype
+var catDiv = function(catClass,id,imgW,imgH,imgSrc,container) {
 	this.id = id;
-	this.container = '<div class="' + catClass + '" id="' + id + '"></div>';
+	this.catDiv = '<div class="' + catClass + '" id="' + id + '"></div>';
 	this.imgWidth = imgW || 300;
 	this.imgHeight = imgH || 300;
 	this.imgSrc = imgSrc || 'https://placekitten.com/g/' + this.imgWidth + '/' + this.imgHeight;
+	this.container = container || '';
+	if (this.container.length == 0) {
+		this.container = 'body';
+	} else if (this.container.indexOf('#') < 0) {
+		this.container = '#' + this.container;
+	}
+	
 	this.catImg = '<div id="' + id + 'img" class="catImg" title="Click Me!"><img src="' + this.imgSrc + '" width="' + this.imgWidth + '" height="' + this.imgHeight + '"/></div>';
 	this.counter = 0;
-	this.counterDiv = '<h3>This cat clicked <span id="' + this.id + 'counter">0</span> times</h3>';
+	this.counterDiv = '<h3>This cat clicked <span id="' + this.id + 'counter"></span> times</h3>';
 	this.resetDiv = '<div class="catCountReset" id="reset' + this.id + '"  title="Reset counter to 0">Reset</div>';
 	this.draw = function() {
-		$('body').append(this.container);
+		$(this.container).html(this.catDiv);
 		$('#' + id).append(this.counterDiv);
 		$('#' + id).append(this.catImg);
 		$('#' + id).append(this.resetDiv);
-		console.log('got to here. cat id is ' + id + ' - container is: ' + $('#' + id).html());
+		$('#' + this.id + 'counter').html(this.counter);
 	}
 	this.increment = function () {
 		this.counter++;
 		$('#' + this.id + 'counter').html(this.counter);
-		console.log('Image ' + this.id + ' clicked. counter is: ' + this.counter);
 	}
 	this.resetCounter = function () {
 		this.counter = 0;
 		$('#' + this.id + 'counter').html(this.counter);
-		console.log(this.id + ' Reset clicked. counter is: ' + this.counter);
 	}
-	this.addListeners = function () {// This solution found at http://stackoverflow.com/questions/12024483/how-to-pass-parameter-to-function-using-in-addeventlistener 
-		var self = this;
+	/*The following not used for the "one-at-a-time" scenario, but leaving for reference */
+	this.addListeners = function () { 
+		var self = this;// This idea found at http://stackoverflow.com/questions/12024483/how-to-pass-parameter-to-function-using-in-addeventlistener
 		var imgId = this.id + 'img';
 		var resetId = 'reset' + this.id;
 		document.getElementById(imgId).addEventListener("click", function() {
@@ -72,7 +98,6 @@ var catDiv = function(catClass,id,imgW,imgH,imgSrc) {
 		});
 	}
 }
-//comment
 </script>
 </body>
 </html>
