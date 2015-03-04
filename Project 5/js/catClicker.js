@@ -18,6 +18,12 @@ $(function() {
 				if (this.catData[i].id == catId) return this.catData[i];
 			}
 		},
+		updateCat: function(catId,catInfo) {
+				// URGH! THIS IS DEFINITELY NOT THE BEST WAY TO DO THIS :P
+				this.catData[catId].name = catInfo[0];
+				this.catData[catId].url = catInfo[1];
+				this.catData[catId].clickCount = catInfo[2];
+		},
 		getAllCats: function() {
 			return this.catData;
 		},
@@ -49,32 +55,69 @@ $(function() {
 		updateCatCounter: function(catId) {
 			catModel.increment(catId);
 			catView.updateCounter(catModel.getCatById(catId));
+			catAdminView.updateClickCount(catModel.getCatById(catId));
+			
 		},
 		resetCatCounter: function(catId) {
 			catModel.reset(catId);
 			catView.updateCounter(catModel.getCatById(catId));
+			catAdminView.updateClickCount(catModel.getCatById(catId));
+		},
+		showCatAdmin: function() {
+			catAdminView.show();
+		},
+		hideCatAdmin: function() {
+			catAdminView.hide();
+		},
+		setCatAdmin: function(catId) {
+			catAdminView.populate(catModel.getCatById(catId));
+		},
+		updateCatInfo: function(catId) {
+			var formInfo = catAdminView.getCatFormInfo();
+			catModel.updateCat(catId,formInfo);
+			catListView.updateListName(catModel.getCatById(catId))
+			catView.render(catModel.getCatById(catId));
 		}
 		
 	};
+	
+	var catAdminView = {// view to handle Cat Admin stuff
+		populate: function(thisCat) {
+			$('#catNameInput').val(thisCat.name);
+			$('#catUrlInput').val(thisCat.url);
+			$('#catClickInput').val(thisCat.clickCount);
+		},
+		show: function() {
+			$('#catAdminForm').css('display','block');
+		},
+		hide: function() {
+			$('#catAdminForm').css('display','none');
+		},
+		updateClickCount:function(thisCat) {
+			$('#catClickInput').val(thisCat.clickCount);
+		},
+		getCatFormInfo: function() {
+			var formInfo = [];
+			formInfo.push($('#catNameInput').val());
+			formInfo.push($('#catUrlInput').val());
+			formInfo.push($('#catClickInput').val());
+			return formInfo;
+		}
+	
+	}
 	
 	var catView = {// view to handle the Cat image Div
 		init: function() {
 			//
 		},
 		render: function(thisCat) {
-			var catDiv = '<div class="catClicker" id="cat' + thisCat.id + '"></div>';
-			var catImg = '<div id="img' + thisCat.id + '" class="catImg" title="Click Me!"><img src="' + thisCat.url + '" width="400px" height="400px"/></div>';
-			var counterDiv = '<h3>' + thisCat.name + ' clicked <span id="' + thisCat.id + 'counter"></span> times</h3>';
-			var resetDiv = '<div class="catCountReset" id="reset' + thisCat.id + '"  title="Reset counter to 0">Reset</div>';
-			$('#catContainer').html(catDiv);
-			$('#cat' + thisCat.id).append(counterDiv);
-			$('#cat' + thisCat.id).append(catImg);
-			$('#cat' + thisCat.id).append(resetDiv);
-			//$('#' + thisCat.id + 'counter').html(thisCat.clickCount);
+			$('#cat-name').html(thisCat.name);
 			this.updateCounter(thisCat);
+			$('#cat-image').attr('src',thisCat.url);
+			$('.catCountReset').attr('id','reset' + thisCat.id);
 		},
 		updateCounter: function(thisCat) {
-			$('#' + thisCat.id + 'counter').html(thisCat.clickCount);
+			$('#cat-click-count').html(thisCat.clickCount);
 		}
 	};
 	
@@ -84,20 +127,41 @@ $(function() {
 			$('#catSelect').change(function() {
 				var catIdx = $(this).find(":selected").val();
 				catController.drawCat(catIdx);
-			})
+				catController.setCatAdmin(catIdx);
+			});
 			$('.catContainer').on('click','.catImg',function() {
 				var clickIdx = $('#catSelect option:selected').val();// kind of cheating, but it works ;)
 				catController.updateCatCounter(clickIdx);
-			});;
+			});
 			$('.catContainer').on('click','.catCountReset',function() {
 				var clickIdx = $('#catSelect option:selected').val();
 				catController.resetCatCounter(clickIdx);
 			});
+			
+			$('#cat-admin').click(function() {
+				var clickIdx = $('#catSelect option:selected').val();
+				if ($('#catAdminForm').css('display') == 'none') {
+					catController.showCatAdmin();
+				} else {
+					catController.hideCatAdmin();
+				}
+			});
+			$('#catFormSave').click(function() {
+				var clickIdx = $('#catSelect option:selected').val();
+				catController.updateCatInfo(clickIdx);
+			});
+			
+			
 		},
 		render: function(catList) {
 			for (var i = 0; i < catList.length; i++) {
 				$('#catSelect').append('<option value="' + catList[i].id + '">' + catList[i].name + '</option>');
 			}
+		},
+		updateListName: function(thisCat) {
+			$("#catSelect > option").each(function() {
+				if (this.value == thisCat.id) {this.text = thisCat.name}
+			});
 		}
 	}
 	catController.init();

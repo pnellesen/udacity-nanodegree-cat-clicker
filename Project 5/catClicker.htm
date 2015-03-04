@@ -3,18 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <style>
-.catClicker {
+.catCountReset, .catAdminButton {
 	display:inline-block;
 	margin:10px;
 }
+.catClicker {
+ margin:10px;
+}
 .catClickCounter {
 }
-.catCountReset {
-width:100px;height:20px;border:1px solid #cccccc;background:#ffffff;text-align:center;cursor:pointer;
+.catCountReset, .catAdminButton {
+	width:100px;height:20px;border:1px solid #cccccc;background:#ffffff;text-align:center;cursor:pointer;
 }
 .catContainer {
-border:1px solid #000000;padding:5px;width:500px;height:500px;margin-top:10px;
-
+	border:1px solid #000000;padding:5px;width:500px;height:500px;margin-top:10px;
+}
+.catCountReset {
+	float:right;
+}
+#catAdminForm {
+	display:none;
 }
 
 </style>
@@ -23,7 +31,22 @@ border:1px solid #000000;padding:5px;width:500px;height:500px;margin-top:10px;
 <body>
 <h1>Click the images below to increment the counter</h1>
 <div><select id="catSelect"><option>-- Please choose a cat --</option></select></div>
-<div id="catContainer" class="catContainer"></div>
+<div id="catContainer" class="catContainer">
+	<div id="cat-div" class="catClicker">
+		<h3><span id="cat-name"></span> clicked <span id="cat-click-count"></span> times</h3>
+		<div class="catImg" title="Click Me!">
+			<img id="cat-image" src="" width="400px" height="400px"/>
+		</div>
+	</div>
+	<div class="catAdminButton" id="cat-admin"  title="Update this cat">Admin</div><div class="catCountReset" id=""  title="Reset counter to 0">Reset</div>
+	<form id="catAdminForm">
+		<div id="catFormName"><span>Name: </span><input type="text" id="catNameInput" value=""/></div>
+		<div id="catFormUrl"><span>Url: </span><input type="text" id="catUrlInput" value=""/></div>
+		<div id="catFormClicks"><span># of clicks: </span><input type="text" id="catClickInput" value=""/></div>
+		<input id="catFormSave" type="button" value="Save">
+	</form>
+	
+</div>
 <script src="js/libs/jquery.min.js"></script>
 <script src="js/catClicker.js"></script>
 </body>
